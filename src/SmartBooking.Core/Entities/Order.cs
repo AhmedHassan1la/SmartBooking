@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace SmartBooking.Core.Entities
 {
-    public class Order : BaseEntity<int>
+    public class Order : BaseEntity
     {
 
-        public string AppUserId { get; set; }
-        public AppUser AppUser { get; set; }
+        public string UserId { get; set; }
+        public AppUser User { get; set; }
 
         public int RestaurantId { get; set; }
         public Restaurant Restaurant { get; set; }

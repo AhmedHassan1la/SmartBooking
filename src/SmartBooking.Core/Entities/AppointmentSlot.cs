@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace SmartBooking.Core.Entities
 {
-    public class AppointmentSlot:BaseEntity<int>
+    public class AppointmentSlot:BaseEntity
     {
 
-        public int DoctorId { get; set; }
+        public string DoctorId { get; set; }
         public Doctor Doctor { get; set; }
 
         public int ClinicId { get; set; }

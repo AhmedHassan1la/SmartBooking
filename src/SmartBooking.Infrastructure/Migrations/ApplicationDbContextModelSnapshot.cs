@@ -155,54 +155,6 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SmartBooking.Core.Entities.Address", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("State")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ZipCode")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId")
-                        .IsUnique()
-                        .HasFilter("[AppUserId] IS NOT NULL");
-
-                    b.ToTable("Addresses");
-                });
-
             modelBuilder.Entity("SmartBooking.Core.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -211,12 +163,19 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -224,6 +183,16 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -269,6 +238,8 @@ namespace SmartBooking.Infrastructure.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.AppointmentSlot", b =>
@@ -285,8 +256,8 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("int");
+                    b.Property<string>("DoctorId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
@@ -311,17 +282,14 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("AppointmentSlotId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("BookedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("int");
+                    b.Property<string>("DoctorId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -331,13 +299,16 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasIndex("AppUserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("AppointmentSlotId");
 
                     b.HasIndex("DoctorId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Bookings");
                 });
@@ -368,51 +339,6 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.ToTable("Clinics");
                 });
 
-            modelBuilder.Entity("SmartBooking.Core.Entities.Doctor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Bio")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Certifications")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<int>("ClinicId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Education")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<int>("SpecialityId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("YearOfExperience")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId")
-                        .IsUnique()
-                        .HasFilter("[AppUserId] IS NOT NULL");
-
-                    b.HasIndex("ClinicId");
-
-                    b.HasIndex("SpecialityId");
-
-                    b.ToTable("Doctors");
-                });
-
             modelBuilder.Entity("SmartBooking.Core.Entities.MenuItem", b =>
                 {
                     b.Property<int>("Id")
@@ -423,9 +349,6 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -453,9 +376,6 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
@@ -470,27 +390,27 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
-
                     b.HasIndex("RestaurantId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.OrderItem", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("OrderId")
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("MenuItemId")
                         .HasColumnType("int");
 
-                    b.Property<int>("OrderId")
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
@@ -499,11 +419,9 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderId", "MenuItemId");
 
                     b.HasIndex("MenuItemId");
-
-                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderItems");
                 });
@@ -560,6 +478,38 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.ToTable("Specialities");
                 });
 
+            modelBuilder.Entity("SmartBooking.Core.Entities.Doctor", b =>
+                {
+                    b.HasBaseType("SmartBooking.Core.Entities.AppUser");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Certifications")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("ClinicId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Education")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("SpecialityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearOfExperience")
+                        .HasColumnType("int");
+
+                    b.HasIndex("ClinicId");
+
+                    b.HasIndex("SpecialityId");
+
+                    b.ToTable("Doctors");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -611,15 +561,6 @@ namespace SmartBooking.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SmartBooking.Core.Entities.Address", b =>
-                {
-                    b.HasOne("SmartBooking.Core.Entities.AppUser", "AppUser")
-                        .WithOne("Address")
-                        .HasForeignKey("SmartBooking.Core.Entities.Address", "AppUserId");
-
-                    b.Navigation("AppUser");
-                });
-
             modelBuilder.Entity("SmartBooking.Core.Entities.AppointmentSlot", b =>
                 {
                     b.HasOne("SmartBooking.Core.Entities.Clinic", "Clinic")
@@ -631,8 +572,7 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.HasOne("SmartBooking.Core.Entities.Doctor", "Doctor")
                         .WithMany("AppointmentSlots")
                         .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Clinic");
 
@@ -641,10 +581,6 @@ namespace SmartBooking.Infrastructure.Migrations
 
             modelBuilder.Entity("SmartBooking.Core.Entities.Booking", b =>
                 {
-                    b.HasOne("SmartBooking.Core.Entities.AppUser", "AppUser")
-                        .WithMany("Bookings")
-                        .HasForeignKey("AppUserId");
-
                     b.HasOne("SmartBooking.Core.Entities.AppointmentSlot", "AppointmentSlot")
                         .WithMany("Bookings")
                         .HasForeignKey("AppointmentSlotId")
@@ -652,42 +588,18 @@ namespace SmartBooking.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("SmartBooking.Core.Entities.Doctor", "Doctor")
-                        .WithMany("Bookings")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("DoctorId");
 
-                    b.Navigation("AppUser");
+                    b.HasOne("SmartBooking.Core.Entities.AppUser", "User")
+                        .WithMany("Bookings")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("AppointmentSlot");
 
                     b.Navigation("Doctor");
-                });
 
-            modelBuilder.Entity("SmartBooking.Core.Entities.Doctor", b =>
-                {
-                    b.HasOne("SmartBooking.Core.Entities.AppUser", "AppUser")
-                        .WithOne("Doctor")
-                        .HasForeignKey("SmartBooking.Core.Entities.Doctor", "AppUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("SmartBooking.Core.Entities.Clinic", "Clinic")
-                        .WithMany("Doctors")
-                        .HasForeignKey("ClinicId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SmartBooking.Core.Entities.Speciality", "Speciality")
-                        .WithMany("Doctors")
-                        .HasForeignKey("SpecialityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Clinic");
-
-                    b.Navigation("Speciality");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.MenuItem", b =>
@@ -703,19 +615,19 @@ namespace SmartBooking.Infrastructure.Migrations
 
             modelBuilder.Entity("SmartBooking.Core.Entities.Order", b =>
                 {
-                    b.HasOne("SmartBooking.Core.Entities.AppUser", "AppUser")
-                        .WithMany("Orders")
-                        .HasForeignKey("AppUserId");
-
                     b.HasOne("SmartBooking.Core.Entities.Restaurant", "Restaurant")
                         .WithMany("Orders")
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("AppUser");
+                    b.HasOne("SmartBooking.Core.Entities.AppUser", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Restaurant");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.OrderItem", b =>
@@ -737,13 +649,34 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("SmartBooking.Core.Entities.Doctor", b =>
+                {
+                    b.HasOne("SmartBooking.Core.Entities.Clinic", "Clinic")
+                        .WithMany("Doctors")
+                        .HasForeignKey("ClinicId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartBooking.Core.Entities.AppUser", null)
+                        .WithOne()
+                        .HasForeignKey("SmartBooking.Core.Entities.Doctor", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartBooking.Core.Entities.Speciality", "Speciality")
+                        .WithMany("Doctors")
+                        .HasForeignKey("SpecialityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Clinic");
+
+                    b.Navigation("Speciality");
+                });
+
             modelBuilder.Entity("SmartBooking.Core.Entities.AppUser", b =>
                 {
-                    b.Navigation("Address");
-
                     b.Navigation("Bookings");
-
-                    b.Navigation("Doctor");
 
                     b.Navigation("Orders");
                 });
@@ -758,13 +691,6 @@ namespace SmartBooking.Infrastructure.Migrations
                     b.Navigation("AppointmentSlots");
 
                     b.Navigation("Doctors");
-                });
-
-            modelBuilder.Entity("SmartBooking.Core.Entities.Doctor", b =>
-                {
-                    b.Navigation("AppointmentSlots");
-
-                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.MenuItem", b =>
@@ -787,6 +713,11 @@ namespace SmartBooking.Infrastructure.Migrations
             modelBuilder.Entity("SmartBooking.Core.Entities.Speciality", b =>
                 {
                     b.Navigation("Doctors");
+                });
+
+            modelBuilder.Entity("SmartBooking.Core.Entities.Doctor", b =>
+                {
+                    b.Navigation("AppointmentSlots");
                 });
 #pragma warning restore 612, 618
         }

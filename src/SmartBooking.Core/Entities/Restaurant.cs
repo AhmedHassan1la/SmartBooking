@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmartBooking.Core.Entities
 {
-    public class Restaurant : BaseEntity<int>
+    public class Restaurant : BaseEntity
     {
 
         public string Name { get; set; }

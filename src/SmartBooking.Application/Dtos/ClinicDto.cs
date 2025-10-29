@@ -8,7 +8,7 @@
     }
 
 
-public class ClinicUpdateDto
+    public class ClinicUpdateDto
     {
         public string Name { get; set; }
         public string Address { get; set; }

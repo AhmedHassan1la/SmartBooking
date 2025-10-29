@@ -8,17 +8,26 @@ namespace SmartBooking.Application.Mapping
     {
         public DoctorProfileMapping()
         {
-            // من Doctor → DoctorReadDto
+            // Doctor → DoctorReadDto
             CreateMap<Doctor, DoctorReadDto>()
                 .ForMember(dest => dest.ClinicName, opt => opt.MapFrom(src => src.Clinic.Name))
                 .ForMember(dest => dest.SpecialityName, opt => opt.MapFrom(src => src.Speciality.Name))
-                .ForMember(dest => dest.AppUserDisplayName, opt => opt.MapFrom(src => src.AppUser.DisplayName));
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.DisplayName));
 
-            // من DoctorCreateDto → Doctor
+            // DoctorCreateDto → Doctor
             CreateMap<DoctorCreateDto, Doctor>();
 
-            // من DoctorUpdateDto → Doctor
+            // DoctorUpdateDto → Doctor
             CreateMap<DoctorUpdateDto, Doctor>();
+
+
+            CreateMap<Doctor, DoctorReadWithSlots>()
+                .ForMember(dest => dest.ClinicName, opt => opt.MapFrom(src => src.Clinic.Name))
+                .ForMember(dest => dest.SpecialityName, opt => opt.MapFrom(src => src.Speciality.Name))
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.DisplayName))
+                .ForMember(dest => dest.Slots, opt => opt.MapFrom(src => src.AppointmentSlots));
+
+            CreateMap<AppointmentSlot, DoctorSlotDto>();
         }
     }
 }

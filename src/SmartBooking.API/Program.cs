@@ -2,6 +2,9 @@ using AutoMapper; // Add this using directive at the top of the file
 using Microsoft.EntityFrameworkCore;
 using SmartBooking.Application.Mapping;
 using SmartBooking.Application.Mappings;
+using SmartBooking.Application.Services.Clinics;
+using SmartBooking.Application.Services.Doctors;
+using SmartBooking.Application.Services.Specialities;
 using SmartBooking.Infrastructure;
 using SmartBooking.Infrastructure.Data;
 
@@ -19,12 +22,6 @@ builder.Services.AddSwaggerGen(options =>
         Title = "SmartBooking API",
         Version = "v1",
         Description = "SmartBooking Platform API Documentation",
-        Contact = new()
-        {
-            Name = "Your Name",
-            Email = "yourname@gmail.com",
-            Url = new Uri("https://yourwebsite.com")
-        },
         License = new()
         {
             Name = "MIT License",
@@ -35,11 +32,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddInfrastructureConfiguration();
 
-// Ensure you have the AutoMapper.Extensions.Microsoft.DependencyInjection package installed
-// You can install it via NuGet Package Manager or using the following command:
-// dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
 builder.Services.AddAutoMapper(typeof(DoctorProfileMapping).Assembly);
-builder.Services.AddAutoMapper(typeof(ClinicProfileMapping));
 
 
 // Configure DbContext
@@ -47,6 +40,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+builder.Services.AddScoped<IDoctorService, DoctorService>();
+builder.Services.AddScoped<IClinicService, ClinicService>();
+builder.Services.AddScoped<ISpecialityService, SpecialityService>();
 
 var app = builder.Build();
 

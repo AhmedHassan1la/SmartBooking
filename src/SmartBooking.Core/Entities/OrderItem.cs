@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmartBooking.Core.Entities
 {
-    public class OrderItem : BaseEntity<int>
+    public class OrderItem : BaseEntity
     {
 
         public int OrderId { get; set; }

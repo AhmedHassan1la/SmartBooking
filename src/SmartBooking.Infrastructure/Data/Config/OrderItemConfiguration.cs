@@ -8,9 +8,8 @@ namespace SmartBooking.Infrastructure.Data.Config
     {
         public void Configure(EntityTypeBuilder<OrderItem> builder)
         {
-            builder.HasKey(oi => oi.Id);
+            builder.HasKey(oi => new { oi.OrderId, oi.MenuItemId });
 
-       
             builder.HasOne(oi => oi.Order)
                    .WithMany(o => o.OrderItems)
                    .HasForeignKey(oi => oi.OrderId)

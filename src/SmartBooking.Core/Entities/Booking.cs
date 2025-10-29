@@ -2,13 +2,13 @@
 
 namespace SmartBooking.Core.Entities
 {
-    public class Booking : BaseEntity<int>
+    public class Booking : BaseEntity
     {
-        public string AppUserId { get; set; }
-        public virtual AppUser AppUser { get; set; }
+        public string UserId { get; set; }
+        public virtual AppUser User { get; set; }
 
 
-        public int DoctorId { get; set; }
+        public string DoctorId { get; set; }
         public Doctor Doctor { get; set; }
 
         public int AppointmentSlotId { get; set; }

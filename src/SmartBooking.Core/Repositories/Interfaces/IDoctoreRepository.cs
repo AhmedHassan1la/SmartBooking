@@ -7,10 +7,11 @@ namespace SmartBooking.Core.Repositories.Interfaces
 {
     public interface IDoctorRepository : IGenericRepository<Doctor>
     {
-        
+
+        Task<Doctor?> GetDoctorById(string id);
         Task<IEnumerable<Doctor>> GetDoctorsWithDetailsAsync();
 
-        Task<Doctor?> GetDoctorWithDetailsByIdAsync(int id);
+        Task<Doctor?> GetDoctorWithDetailsByIdAsync(string id);
 
         Task<IEnumerable<Doctor>> GetDoctorsByClinicIdAsync(int clinicId);
 

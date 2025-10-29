@@ -1,129 +1,74 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SmartBooking.Application.Dtos;
-using SmartBooking.Core.Entities;
-using SmartBooking.Core.Repositories.Interfaces;
-using AutoMapper;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SmartBooking.Application.Services.Doctors;
 
 namespace SmartBooking.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DoctorsController : ControllerBase
+    public class DoctorsController(IDoctorService doctorService) : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public DoctorsController(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetAllDoctors()
-        {
-            var doctors = await _unitOfWork.Doctors.GetDoctorsWithDetailsAsync();
-            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
-            return Ok(result);
-        }
+        public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetAllDoctors() =>
+            Ok(await doctorService.GetAllAsync());
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<DoctorReadDto>> GetDoctorById(int id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<DoctorReadDto>> GetDoctorById([FromRoute] string id)
         {
-            var doctor = await _unitOfWork.Doctors.GetDoctorWithDetailsByIdAsync(id);
-            if (doctor == null)
-                return NotFound("Doctor not found.");
+            var doctor = await doctorService.GetByIdAsync(id);
 
-            return Ok(_mapper.Map<DoctorReadDto>(doctor));
+            return doctor is null ? NotFound("Doctor not found") : Ok(doctor);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateDoctor([FromBody] DoctorCreateDto dto)
         {
-            var doctor = _mapper.Map<Doctor>(dto);
-            await _unitOfWork.Repository<Doctor>().AddAsync(doctor);
-            await _unitOfWork.CompleteAsync();
-
-            var createdDoctor = await _unitOfWork.Doctors.GetDoctorWithDetailsByIdAsync(doctor.Id);
-            var result = _mapper.Map<DoctorReadDto>(createdDoctor);
-
-            return CreatedAtAction(nameof(GetDoctorById), new { id = result.Id }, result);
+            var doctor = await doctorService.CreateAsync(dto);
+            
+            return CreatedAtAction(nameof(GetDoctorById), new { id = doctor.Id }, doctor);
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult> UpdateDoctor(int id, [FromBody] DoctorUpdateDto dto)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateDoctor([FromRoute] string id, [FromBody] DoctorUpdateDto dto)
         {
-            var existingDoctor = await _unitOfWork.Repository<Doctor>().GetAsync(id);
-            if (existingDoctor == null)
-                return NotFound("Doctor not found for update.");
+            var isUpdated = await doctorService.UpdateAsync(id, dto);
 
-            _mapper.Map(dto, existingDoctor);
-
-            await _unitOfWork.CompleteAsync();
-            return NoContent();
+            return !isUpdated ? NotFound("Doctor not found.") : NoContent();
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<ActionResult> DeleteDoctor(int id)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteDoctor([FromRoute] string id)
         {
-            var doctor = await _unitOfWork.Repository<Doctor>().GetAsync(id);
-            if (doctor == null)
-                return NotFound("Doctor not found for deletion.");
+            var isDeleted = await doctorService.DeleteAsync(id);
 
-            await _unitOfWork.Repository<Doctor>().DeleteAsync(doctor);
-            await _unitOfWork.CompleteAsync();
-            return NoContent();
+            return !isDeleted ? NotFound("Doctor not found.") : NoContent();
+
         }
 
-        [HttpGet("clinic/{clinicId:int}")]
-        public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetDoctorsByClinic(int clinicId)
+        [HttpGet("clinic/{clinicId}")]
+        public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetDoctorsByClinic([FromRoute] int clinicId)
         {
-            var doctors = await _unitOfWork.Doctors.GetDoctorsByClinicIdAsync(clinicId);
-            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
-            return Ok(result);
+            return Ok(await doctorService.GetAllByClinicAsync(clinicId));
         }
 
-        [HttpGet("speciality/{specialityId:int}")]
-        public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetDoctorsBySpeciality(int specialityId)
+        [HttpGet("speciality/{specialityId}")]
+        public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetDoctorsBySpeciality([FromRoute] int specialityId)
         {
-            var doctors = await _unitOfWork.Doctors.GetDoctorsBySpecialityIdAsync(specialityId);
-            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
-            return Ok(result);
+            return Ok(await doctorService.GetAllBySpecialityAsync(specialityId));
         }
 
-        [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<DoctorReadDto>>> SearchDoctorsByName([FromQuery] string name)
+        [HttpGet("search/{name}")]
+        public async Task<ActionResult<IEnumerable<DoctorReadDto>>> SearchDoctorsByName([FromRoute] string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return BadRequest("Name is required for search.");
-
-            var doctors = await _unitOfWork.Doctors.GetDoctorsByNameAsync(name);
-            if (!doctors.Any())
-                return NotFound("No doctors found matching the provided name.");
-
-            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
-            return Ok(result);
+            return Ok(await doctorService.SearchByName(name));
         }
 
         [HttpGet("available")]
-        public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetDoctorsWithAvailableSlots()
+        public async Task<ActionResult<IEnumerable<DoctorReadWithSlots>>> GetDoctorsWithAvailableSlots()
         {
-            var doctors = await _unitOfWork.Doctors.GetDoctorsWithAvailableSlotsAsync();
-            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
-            return Ok(result);
+            return Ok(await doctorService.GetAllWithSlots());
         }
 
-        [HttpGet("exists")]
-        public async Task<ActionResult<bool>> DoctorExistsByEmail([FromQuery] string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return BadRequest("Email is required.");
-
-            bool exists = await _unitOfWork.Doctors.DoctorExistsByEmailAsync(email);
-            return Ok(exists);
-        }
     }
 }

@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace SmartBooking.Core.Entities
 {
-    public class Doctor : BaseEntity<int>
+    public class Doctor : AppUser
     {
-
-        public string AppUserId { get; set; } = null;
-        public virtual AppUser AppUser { get; set; }
-
-
         public string Bio { get; set; }
         public string Certifications { get; set; }
         public string Education { get; set; }
@@ -24,8 +19,7 @@ namespace SmartBooking.Core.Entities
         public int SpecialityId { get; set; }
         public Speciality Speciality { get; set; }
 
-        public ICollection<AppointmentSlot> AppointmentSlots { get; set; }
-        public ICollection<Booking> Bookings { get; set; }
+        public ICollection<AppointmentSlot> AppointmentSlots { get; set; } = [];
     }
 
 }

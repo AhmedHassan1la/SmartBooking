@@ -13,7 +13,6 @@ namespace SmartBooking.Infrastructure.Data
         {
         }
 
-        public DbSet<Address> Addresses { get; set; }
         public DbSet<Clinic> Clinics { get; set; }
         public DbSet<Speciality> Specialities { get; set; }
         public DbSet<Doctor> Doctors { get; set; }

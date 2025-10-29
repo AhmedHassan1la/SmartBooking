@@ -8,7 +8,6 @@ namespace SmartBooking.Application.Dtos
 {
     public class DoctorCreateDto
     {
-        public string AppUserId { get; set; } = null;
         public string Bio { get; set; }
         public string Certifications { get; set; }
         public string Education { get; set; }
@@ -30,8 +29,8 @@ namespace SmartBooking.Application.Dtos
 
     public class DoctorReadDto
     {
-        public int Id { get; set; } 
-        public string AppUserId { get; set; }
+        public int Id { get; set; }
+        public string FullName { get; set; }
         public string Bio { get; set; }
         public string Certifications { get; set; }
         public string Education { get; set; }
@@ -40,6 +39,19 @@ namespace SmartBooking.Application.Dtos
         public string ClinicName { get; set; } 
         public string SpecialityName { get; set; } 
 
-        public string AppUserDisplayName { get; set; }
+    }
+
+    public class DoctorReadWithSlots
+    {
+        public int Id { get; set; }
+        public string FullName { get; set; }
+        public string Bio { get; set; }
+        public string Certifications { get; set; }
+        public string Education { get; set; }
+        public int YearOfExperience { get; set; }
+        public string ClinicName { get; set; }
+        public string SpecialityName { get; set; }
+        public IEnumerable<DoctorSlotDto> Slots { get; set; }
+
     }
 }

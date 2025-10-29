@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SmartBooking.Application.Dtos;
+using SmartBooking.Application.Services.Doctors;
+using SmartBooking.Application.Services.Specialities;
 using SmartBooking.Core.Entities;
 using SmartBooking.Core.Repositories.Interfaces;
 using System.Collections.Generic;
@@ -11,76 +13,44 @@ namespace SmartBooking.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SpecialitiesController : ControllerBase
+    public class SpecialitiesController(ISpecialityService specialityService) : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public SpecialitiesController(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
-
-        // GET: api/specialities
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SpecialityReadDto>>> GetAll()
-        {
-            var specialities = await _unitOfWork.Repository<Speciality>().GetAllAsync();
-            var result = _mapper.Map<IEnumerable<SpecialityReadDto>>(specialities);
-            return Ok(result);
-        }
+        public async Task<ActionResult<IEnumerable<SpecialityReadDto>>> GetAll() =>
+            Ok(await specialityService.GetAllAsync());
 
-        // GET: api/specialities/{id}
-        [HttpGet("{id:int}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<SpecialityReadDto>> GetById(int id)
         {
-            var speciality = await _unitOfWork.Repository<Speciality>().GetAsync(id);
+            var speciality = await specialityService.GetByIdAsync(id);
             if (speciality == null)
                 return NotFound("Speciality not found.");
 
-            var result = _mapper.Map<SpecialityReadDto>(speciality);
-            return Ok(result);
+            return Ok(speciality);
         }
 
-        // POST: api/specialities
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] SpecialityCreateDto dto)
         {
-            var speciality = _mapper.Map<Speciality>(dto);
-
-            await _unitOfWork.Repository<Speciality>().AddAsync(speciality);
-            await _unitOfWork.CompleteAsync();
-
-            var result = _mapper.Map<SpecialityReadDto>(speciality);
-            return CreatedAtAction(nameof(GetById), new { id = speciality.Id }, result);
+            var speciality = await specialityService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = speciality.Id }, speciality);
         }
 
-        // PUT: api/specialities/{id}
-        [HttpPut("{id:int}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] SpecialityUpdateDto dto)
         {
-            var existing = await _unitOfWork.Repository<Speciality>().GetAsync(id);
-            if (existing == null)
-                return NotFound("Speciality not found for update.");
+            var isUpdated = await specialityService.UpdateAsync(id, dto);
 
-            _mapper.Map(dto, existing);
-
-            await _unitOfWork.CompleteAsync();
-            return NoContent();
+            return !isUpdated ? NotFound("Speciality not found.") : NoContent();
         }
 
-        // DELETE: api/specialities/{id}
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var speciality = await _unitOfWork.Repository<Speciality>().GetAsync(id);
-            if (speciality == null)
-                return NotFound("Speciality not found for deletion.");
+            var isDeleted = await specialityService.DeleteAsync(id);
 
-            await _unitOfWork.Repository<Speciality>().DeleteAsync(speciality);
-            await _unitOfWork.CompleteAsync();
-            return NoContent();
+            return !isDeleted ? NotFound("Speciality not found.") : NoContent();
         }
     }
 }
