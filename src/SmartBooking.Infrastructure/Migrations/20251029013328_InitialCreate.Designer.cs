@@ -12,8 +12,8 @@ using SmartBooking.Infrastructure.Data;
 namespace SmartBooking.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251028124525_allTables")]
-    partial class allTables
+    [Migration("20251029013328_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

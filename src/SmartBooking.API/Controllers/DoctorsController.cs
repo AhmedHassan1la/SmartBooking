@@ -2,6 +2,7 @@
 using SmartBooking.Application.Dtos;
 using SmartBooking.Core.Entities;
 using SmartBooking.Core.Repositories.Interfaces;
+using AutoMapper;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,53 +14,19 @@ namespace SmartBooking.API.Controllers
     public class DoctorsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-    public DoctorsController(IUnitOfWork unitOfWork)
+        public DoctorsController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
-
-  
-
-        private DoctorReadDto MapToReadDto(Doctor doctor)
-        {
-            if (doctor == null) return null;
-
-            return new DoctorReadDto
-            {
-                Id = doctor.Id,
-                AppUserId = doctor.AppUserId,
-                Bio = doctor.Bio,
-                Certifications = doctor.Certifications,
-                Education = doctor.Education,
-                YearOfExperience = doctor.YearOfExperience,
-                ClinicName = doctor.Clinic?.Name,
-                SpecialityName = doctor.Speciality?.Name,
-                AppUserDisplayName = doctor.AppUser?.DisplayName
-            };
-        }
-
-        private Doctor MapToEntity(DoctorCreateDto dto)
-        {
-            return new Doctor
-            {
-                AppUserId = dto.AppUserId,
-                Bio = dto.Bio,
-                Certifications = dto.Certifications,
-                Education = dto.Education,
-                YearOfExperience = dto.YearOfExperience,
-                ClinicId = dto.ClinicId,
-                SpecialityId = dto.SpecialityId
-            };
-        }
-
-       
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetAllDoctors()
         {
             var doctors = await _unitOfWork.Doctors.GetDoctorsWithDetailsAsync();
-            var result = doctors.Select(MapToReadDto).ToList();
+            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
             return Ok(result);
         }
 
@@ -70,21 +37,20 @@ namespace SmartBooking.API.Controllers
             if (doctor == null)
                 return NotFound("Doctor not found.");
 
-            return Ok(MapToReadDto(doctor));
+            return Ok(_mapper.Map<DoctorReadDto>(doctor));
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateDoctor([FromBody] DoctorCreateDto dto)
         {
-            var doctor = MapToEntity(dto);
+            var doctor = _mapper.Map<Doctor>(dto);
             await _unitOfWork.Repository<Doctor>().AddAsync(doctor);
             await _unitOfWork.CompleteAsync();
 
             var createdDoctor = await _unitOfWork.Doctors.GetDoctorWithDetailsByIdAsync(doctor.Id);
+            var result = _mapper.Map<DoctorReadDto>(createdDoctor);
 
-            return CreatedAtAction(nameof(GetDoctorById),
-                new { id = createdDoctor!.Id },
-                MapToReadDto(createdDoctor));
+            return CreatedAtAction(nameof(GetDoctorById), new { id = result.Id }, result);
         }
 
         [HttpPut("{id:int}")]
@@ -94,12 +60,7 @@ namespace SmartBooking.API.Controllers
             if (existingDoctor == null)
                 return NotFound("Doctor not found for update.");
 
-            existingDoctor.Bio = dto.Bio;
-            existingDoctor.Certifications = dto.Certifications;
-            existingDoctor.Education = dto.Education;
-            existingDoctor.YearOfExperience = dto.YearOfExperience;
-            existingDoctor.ClinicId = dto.ClinicId;
-            existingDoctor.SpecialityId = dto.SpecialityId;
+            _mapper.Map(dto, existingDoctor);
 
             await _unitOfWork.CompleteAsync();
             return NoContent();
@@ -114,17 +75,14 @@ namespace SmartBooking.API.Controllers
 
             await _unitOfWork.Repository<Doctor>().DeleteAsync(doctor);
             await _unitOfWork.CompleteAsync();
-
             return NoContent();
         }
-
-       
 
         [HttpGet("clinic/{clinicId:int}")]
         public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetDoctorsByClinic(int clinicId)
         {
             var doctors = await _unitOfWork.Doctors.GetDoctorsByClinicIdAsync(clinicId);
-            var result = doctors.Select(MapToReadDto).ToList();
+            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
             return Ok(result);
         }
 
@@ -132,11 +90,10 @@ namespace SmartBooking.API.Controllers
         public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetDoctorsBySpeciality(int specialityId)
         {
             var doctors = await _unitOfWork.Doctors.GetDoctorsBySpecialityIdAsync(specialityId);
-            var result = doctors.Select(MapToReadDto).ToList();
+            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
             return Ok(result);
         }
 
-        // GET: api/doctors/search?name=ahmed
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<DoctorReadDto>>> SearchDoctorsByName([FromQuery] string name)
         {
@@ -144,24 +101,21 @@ namespace SmartBooking.API.Controllers
                 return BadRequest("Name is required for search.");
 
             var doctors = await _unitOfWork.Doctors.GetDoctorsByNameAsync(name);
-
             if (!doctors.Any())
                 return NotFound("No doctors found matching the provided name.");
 
-            var result = doctors.Select(MapToReadDto).ToList();
+            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
             return Ok(result);
         }
 
-        // GET: api/doctors/available
         [HttpGet("available")]
         public async Task<ActionResult<IEnumerable<DoctorReadDto>>> GetDoctorsWithAvailableSlots()
         {
             var doctors = await _unitOfWork.Doctors.GetDoctorsWithAvailableSlotsAsync();
-            var result = doctors.Select(MapToReadDto).ToList();
+            var result = _mapper.Map<IEnumerable<DoctorReadDto>>(doctors);
             return Ok(result);
         }
 
-        // GET: api/doctors/exists?email=example@mail.com
         [HttpGet("exists")]
         public async Task<ActionResult<bool>> DoctorExistsByEmail([FromQuery] string email)
         {
@@ -172,5 +126,4 @@ namespace SmartBooking.API.Controllers
             return Ok(exists);
         }
     }
-
 }

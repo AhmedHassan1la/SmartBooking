@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using SmartBooking.Application.Dtos;
 using SmartBooking.Core.Entities;
 using SmartBooking.Core.Repositories.Interfaces;
@@ -13,45 +14,20 @@ namespace SmartBooking.API.Controllers
     public class SpecialitiesController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public SpecialitiesController(IUnitOfWork unitOfWork)
+        public SpecialitiesController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
-
-        // =======================================================
-        // دوال التحويل (Manual Mapping)
-        // =======================================================
-
-        private SpecialityReadDto MapToReadDto(Speciality speciality)
-        {
-            if (speciality == null) return null;
-
-            return new SpecialityReadDto
-            {
-                Id = speciality.Id,
-                Name = speciality.Name,
-                Description = speciality.Description
-            };
-        }
-
-        private Speciality MapToEntity(SpecialityCreateDto dto)
-        {
-            return new Speciality
-            {
-                Name = dto.Name,
-                Description = dto.Description
-            };
-        }
-
-    
 
         // GET: api/specialities
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SpecialityReadDto>>> GetAll()
         {
             var specialities = await _unitOfWork.Repository<Speciality>().GetAllAsync();
-            var result = specialities.Select(MapToReadDto).ToList();
+            var result = _mapper.Map<IEnumerable<SpecialityReadDto>>(specialities);
             return Ok(result);
         }
 
@@ -63,18 +39,21 @@ namespace SmartBooking.API.Controllers
             if (speciality == null)
                 return NotFound("Speciality not found.");
 
-            return Ok(MapToReadDto(speciality));
+            var result = _mapper.Map<SpecialityReadDto>(speciality);
+            return Ok(result);
         }
 
         // POST: api/specialities
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] SpecialityCreateDto dto)
         {
-            var speciality = MapToEntity(dto);
+            var speciality = _mapper.Map<Speciality>(dto);
+
             await _unitOfWork.Repository<Speciality>().AddAsync(speciality);
             await _unitOfWork.CompleteAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = speciality.Id }, MapToReadDto(speciality));
+            var result = _mapper.Map<SpecialityReadDto>(speciality);
+            return CreatedAtAction(nameof(GetById), new { id = speciality.Id }, result);
         }
 
         // PUT: api/specialities/{id}
@@ -85,8 +64,7 @@ namespace SmartBooking.API.Controllers
             if (existing == null)
                 return NotFound("Speciality not found for update.");
 
-            existing.Name = dto.Name;
-            existing.Description = dto.Description;
+            _mapper.Map(dto, existing);
 
             await _unitOfWork.CompleteAsync();
             return NoContent();

@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using SmartBooking.Application.DTOs;
 using SmartBooking.Core.Entities;
 using SmartBooking.Core.Repositories.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SmartBooking.API.Controllers
 {
@@ -10,11 +14,12 @@ namespace SmartBooking.API.Controllers
     public class ClinicsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-
-    public ClinicsController(IUnitOfWork unitOfWork)
+        public ClinicsController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         // GET: api/clinics
@@ -22,14 +27,7 @@ namespace SmartBooking.API.Controllers
         public async Task<ActionResult<IEnumerable<ClinicReadDto>>> GetAllClinics()
         {
             var clinics = await _unitOfWork.Repository<Clinic>().GetAllAsync();
-            var result = clinics.Select(c => new ClinicReadDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Address = c.Address,
-                PhoneNumber = c.PhoneNumber
-            });
-
+            var result = _mapper.Map<IEnumerable<ClinicReadDto>>(clinics);
             return Ok(result);
         }
 
@@ -41,14 +39,7 @@ namespace SmartBooking.API.Controllers
             if (clinic == null)
                 return NotFound();
 
-            var result = new ClinicReadDto
-            {
-                Id = clinic.Id,
-                Name = clinic.Name,
-                Address = clinic.Address,
-                PhoneNumber = clinic.PhoneNumber
-            };
-
+            var result = _mapper.Map<ClinicReadDto>(clinic);
             return Ok(result);
         }
 
@@ -56,23 +47,12 @@ namespace SmartBooking.API.Controllers
         [HttpPost]
         public async Task<ActionResult<ClinicReadDto>> CreateClinic([FromBody] ClinicCreateDto dto)
         {
-            var clinic = new Clinic
-            {
-                Name = dto.Name,
-                Address = dto.Address,
-                PhoneNumber = dto.PhoneNumber
-            };
+            var clinic = _mapper.Map<Clinic>(dto);
 
             await _unitOfWork.Repository<Clinic>().AddAsync(clinic);
             await _unitOfWork.CompleteAsync();
 
-            var result = new ClinicReadDto
-            {
-                Id = clinic.Id,
-                Name = clinic.Name,
-                Address = clinic.Address,
-                PhoneNumber = clinic.PhoneNumber
-            };
+            var result = _mapper.Map<ClinicReadDto>(clinic);
 
             return CreatedAtAction(nameof(GetClinicById), new { id = clinic.Id }, result);
         }
@@ -85,9 +65,7 @@ namespace SmartBooking.API.Controllers
             if (existingClinic == null)
                 return NotFound();
 
-            existingClinic.Name = dto.Name;
-            existingClinic.Address = dto.Address;
-            existingClinic.PhoneNumber = dto.PhoneNumber;
+            _mapper.Map(dto, existingClinic);
 
             await _unitOfWork.Repository<Clinic>().UpdateAsync(id, existingClinic);
             await _unitOfWork.CompleteAsync();
@@ -109,6 +87,4 @@ namespace SmartBooking.API.Controllers
             return NoContent();
         }
     }
-
-
 }

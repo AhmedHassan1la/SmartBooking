@@ -1,4 +1,7 @@
+using AutoMapper; // Add this using directive at the top of the file
 using Microsoft.EntityFrameworkCore;
+using SmartBooking.Application.Mapping;
+using SmartBooking.Application.Mappings;
 using SmartBooking.Infrastructure;
 using SmartBooking.Infrastructure.Data;
 
@@ -29,7 +32,16 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
 builder.Services.AddInfrastructureConfiguration();
+
+// Ensure you have the AutoMapper.Extensions.Microsoft.DependencyInjection package installed
+// You can install it via NuGet Package Manager or using the following command:
+// dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
+builder.Services.AddAutoMapper(typeof(DoctorProfileMapping).Assembly);
+builder.Services.AddAutoMapper(typeof(ClinicProfileMapping));
+
+
 // Configure DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
