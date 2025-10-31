@@ -22,6 +22,7 @@ namespace SmartBooking.Infrastructure.Repositories
         public IDoctorRepository Doctors => new DoctorRepository(_context);
         public IClinicRepository Clinics => new ClinicRepository(_context);
         public ISpecialityRepository Specialities => new SpecialityRepository(_context);
+        public IRestaurantRepository Restaurants => new RestaurantRepository(_context);
      
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class
         {

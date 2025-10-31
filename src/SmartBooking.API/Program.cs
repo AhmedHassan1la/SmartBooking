@@ -4,6 +4,7 @@ using SmartBooking.Application.Mapping;
 using SmartBooking.Application.Mappings;
 using SmartBooking.Application.Services.Clinics;
 using SmartBooking.Application.Services.Doctors;
+using SmartBooking.Application.Services.Restaurants;
 using SmartBooking.Application.Services.Specialities;
 using SmartBooking.Infrastructure;
 using SmartBooking.Infrastructure.Data;
@@ -44,6 +45,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IClinicService, ClinicService>();
 builder.Services.AddScoped<ISpecialityService, SpecialityService>();
+builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 
 var app = builder.Build();
 

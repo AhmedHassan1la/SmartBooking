@@ -8,6 +8,7 @@ namespace SmartBooking.Core.Repositories.Interfaces
         IDoctorRepository Doctors { get; }
         IClinicRepository Clinics { get; }
         ISpecialityRepository Specialities { get; }
+        IRestaurantRepository Restaurants { get; }
     
         IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class;
 

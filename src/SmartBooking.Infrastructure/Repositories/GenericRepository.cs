@@ -5,8 +5,6 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SmartBooking.Infrastructure.Data
 {
-    // نفترض أنك تستخدم اسم مشروعك هنا بدلاً من 'SmartBookingDbContext'
-    // يجب أن تكون الفئة 'TContext' هي الـ DbContext الخاص بك.
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         private readonly DbContext _context;
@@ -18,16 +16,9 @@ namespace SmartBooking.Infrastructure.Data
             _dbSet = _context.Set<T>();
         }
 
-        // -------------------------------------------------------------------
-        // ## العمليات الأساسية (CRUD)
-        // -------------------------------------------------------------------
-
         public async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
-            // ملاحظة: حفظ التغييرات (SaveChanges) يتم عادةً في وحدة العمل (UnitOfWork)
-            // لكن يمكنك إضافتها هنا إذا كنت لا تستخدم UnitOfWork.
-            // await _context.SaveChangesAsync();
         }
         public Task UpdateAsync(int id, T entity)
         {
@@ -45,11 +36,6 @@ namespace SmartBooking.Infrastructure.Data
             return Task.CompletedTask;
         }
 
-
-        // -------------------------------------------------------------------
-        // ## الحصول على الكل (Get All)
-        // -------------------------------------------------------------------
-
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
@@ -59,10 +45,6 @@ namespace SmartBooking.Infrastructure.Data
         {
             return _dbSet.ToList();
         }
-
-        // -------------------------------------------------------------------
-        // ## الحصول على الكل مع التضمين (Includes)
-        // -------------------------------------------------------------------
 
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, object>>[] Includes)
         {
@@ -90,17 +72,11 @@ namespace SmartBooking.Infrastructure.Data
                     query = query.Include(include);
                 }
             }
-            // Execute the query and return the result
             return query.ToList();
         }
 
-        // -------------------------------------------------------------------
-        // ## الحصول بالمعرّف (Get By Id)
-        // -------------------------------------------------------------------
-
         public async Task<T> GetAsync(int id)
         {
-            // FindAsync هي الطريقة الأسرع للبحث بواسطة المفتاح الرئيسي
             return await _dbSet.FindAsync(id);
         }
     }
