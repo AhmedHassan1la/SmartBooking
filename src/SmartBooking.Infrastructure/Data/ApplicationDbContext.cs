@@ -15,8 +15,7 @@ namespace SmartBooking.Infrastructure.Data
 
         public DbSet<Clinic> Clinics { get; set; }
         public DbSet<Speciality> Specialities { get; set; }
-        public DbSet<Doctor> Doctors { get; set; }
-        public DbSet<AppointmentSlot> AppointmentSlots { get; set; }
+        public DbSet<Doctor> Doctors { get; set; }        public DbSet<AppointmentSlot> AppointmentSlots { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Restaurant> Restaurants { get; set; }
         public DbSet<MenuItem> MenuItems { get; set; }

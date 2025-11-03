@@ -1,15 +1,26 @@
-using AutoMapper; // Add this using directive at the top of the file
+using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SmartBooking.Application.Mapping;
 using SmartBooking.Application.Mappings;
 using SmartBooking.Application.Services.Clinics;
 using SmartBooking.Application.Services.Doctors;
 using SmartBooking.Application.Services.Specialities;
+using SmartBooking.Core.Entities;
+using SmartBooking.Core.Features.User.Command.Models;
+using SmartBooking.Core.Features.User.Command.Validatiors;
 using SmartBooking.Infrastructure;
 using SmartBooking.Infrastructure.Data;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
 // Add services to the container
 builder.Services.AddControllers();
 
@@ -32,7 +43,38 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddInfrastructureConfiguration();
 
+// Add AutoMapper
 builder.Services.AddAutoMapper(typeof(DoctorProfileMapping).Assembly);
+
+// Add MediatR
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly));
+
+// Add Identity
+// Add Identity
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+// Add JWT Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 
 
 // Configure DbContext
@@ -41,6 +83,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+// Add Services
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IClinicService, ClinicService>();
 builder.Services.AddScoped<ISpecialityService, SpecialityService>();
@@ -56,6 +99,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Add Authentication & Authorization Middleware
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();

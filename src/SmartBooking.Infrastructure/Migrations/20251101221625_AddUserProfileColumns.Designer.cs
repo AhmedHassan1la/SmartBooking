@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartBooking.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SmartBooking.Infrastructure.Data;
 namespace SmartBooking.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251101221625_AddUserProfileColumns")]
+    partial class AddUserProfileColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,7 +283,7 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("AppointmentSlots", (string)null);
+                    b.ToTable("AppointmentSlots");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.Booking", b =>
@@ -319,7 +322,7 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.Clinic", b =>
@@ -345,7 +348,7 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Clinics", (string)null);
+                    b.ToTable("Clinics");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.MenuItem", b =>
@@ -374,7 +377,7 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("MenuItems", (string)null);
+                    b.ToTable("MenuItems");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.Order", b =>
@@ -408,7 +411,7 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.OrderItem", b =>
@@ -432,7 +435,7 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.HasIndex("MenuItemId");
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.Restaurant", b =>
@@ -463,7 +466,7 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Restaurants", (string)null);
+                    b.ToTable("Restaurants");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.Speciality", b =>
@@ -484,7 +487,7 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specialities", (string)null);
+                    b.ToTable("Specialities");
                 });
 
             modelBuilder.Entity("SmartBooking.Core.Entities.Doctor", b =>
@@ -516,7 +519,7 @@ namespace SmartBooking.Infrastructure.Migrations
 
                     b.HasIndex("SpecialityId");
 
-                    b.ToTable("Doctors", (string)null);
+                    b.ToTable("Doctors");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
